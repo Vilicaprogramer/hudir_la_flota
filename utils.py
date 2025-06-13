@@ -100,3 +100,14 @@ def crea_barco_usuario(tablero, eslora, fila, columna ,punto_cardinal):
         tablero_temp = coloca_barco_plus(tablero, barco)
         if type(tablero_temp) == np.ndarray:
             return tablero_temp
+
+
+banner = r'''
+  |   |  |   |   \  |  __ \ _ _|   _ \       |         \         ____|  |       _ \ __ __|   \    
+  |   |  |   |    \ |  |   |  |   |   |      |        _ \        |      |      |   |   |    _ \   
+  ___ |  |   |  |\  |  |   |  |   __ <       |       ___ \       __|    |      |   |   |   ___ \  
+ _|  _| \___/  _| \_| ____/ ___| _| \_\     _____| _/    _\     _|     _____| \___/   _| _/    _\ 
+                                                                                                  
+'''
+
+print(banner)
