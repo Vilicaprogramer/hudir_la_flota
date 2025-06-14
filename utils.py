@@ -3,12 +3,45 @@ Habrá un apartado de funciones que interactuarán con el usuario y otro apartad
 que trabajarán con la máquina'''
 import random
 import numpy as np
+import time
 
-barcos = [5,4,4,3,3,3,2,2,1,1,1,1]
+banner = r'''
+  |   |  |   |   \  |  __ \ _ _|   _ \       |         \         ____|  |       _ \ __ __|   \    
+  |   |  |   |    \ |  |   |  |   |   |      |        _ \        |      |      |   |   |    _ \   
+  ___ |  |   |  |\  |  |   |  |   __ <       |       ___ \       __|    |      |   |   |   ___ \  
+ _|  _| \___/  _| \_| ____/ ___| _| \_\     _____| _/    _\     _|     _____| \___/   _| _/    _\ 
+                                                                                                  
+'''
+
+#barcos = [5,4,4,3,3,3,2,2,1,1,1,1]
+barcos = [10,1]
+
+def lanza_moneda():
+    while True:
+        moneda = input('Elige cara o cruz para ver quien empieza: ').lower()
+        if moneda not in ['cara', 'cruz']:
+            print('Eso no es una opción correcta, intentalo de nuevo')
+        else:
+            cara_aleatoria = random.choice(['cara', 'cruz'])
+            for i in range(3,0,-1):
+                print(i)
+                time.sleep(1)
+
+            if moneda != cara_aleatoria:
+                return f'{cara_aleatoria.capitalize()} comienza la máquina'
+            else:
+                return f'{cara_aleatoria.capitalize()} comienza el jugador humano'
+
+
+def verificar_tablero(tablero):
+    if any("O" in fila for fila in tablero):
+        return True
+    else:
+        return False
 
 # Funciones de la máquina
-def crea_tablero(lado = 10):
-    tablero = np.full((lado,lado),"~")
+def crea_tablero(lado = 10, simbolo = "~"):
+    tablero = np.full((lado,lado),simbolo)
     return tablero
 
 
@@ -40,7 +73,7 @@ def coloca_barco_plus(tablero, barco):
 
 
 
-def crea_barco_aleatorio(tablero, eslora, num_intentos = 100):
+def crea_barco_aleatorio(tablero, eslora):
     num_max_filas = tablero.shape[0]
     num_max_columnas = tablero.shape[1]
     while True:
@@ -66,48 +99,83 @@ def crea_barco_aleatorio(tablero, eslora, num_intentos = 100):
         if type(tablero_temp) == np.ndarray:
             return tablero_temp
 
-        
-
-        
-
+def recibir_disparo_humano(tablero1, tablero2):
+    while True:
+        posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
+        num_max_filas = tablero1.shape[0]
+        num_max_columnas = tablero1.shape[1]
+        coordenada = (random.randint(0,num_max_filas - 1), random.randint(0,num_max_columnas - 1))
+        letra = [clave for clave, valor in posicion.items() if valor == coordenada[1]]
+        print(f'La máquina ha elegido la fila {coordenada[0] + 1} y la columna {letra[0]}')
+        time.sleep(2)
+        if tablero1[coordenada] == "O":
+            tablero1[coordenada] = "X"
+            tablero2[coordenada] = "X"
+            print("Tocado")
+            return False
+        elif tablero2[coordenada] == "X" or tablero2[coordenada] == "~":
+            print("Ahí ya has disparado, dispara a otro sitio!!")
+        else:
+            tablero2[coordenada] = "~"
+            print("Agua")
+            return False
 
 
 # Funciones de usuario
 
-def crea_barco_usuario(tablero, eslora, fila, columna ,punto_cardinal):
-    num_max_filas = tablero.shape[0]
-    num_max_columnas = tablero.shape[1]
+def crea_barco_usuario(tablero, eslora):
+        while True:
+            posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
+            barco = []
+            try:
+                fila = int(input("Introduce el número de fila: "))
+                columna = input("Introduce la letra de la columna: ").upper()
+                pieza_original = (fila - 1, posicion[columna])
+                barco.append(pieza_original)
+                fila = pieza_original[0]
+                columna = pieza_original[1]
+                if eslora != 1:
+                    orientacion = input("Introduce N,S,O,E para ver la dirección del barco: ").upper()
+                # Construimos el hipotetico barco
+                    for i in range(eslora -1):
+                        if orientacion == "N":
+                            fila -= 1
+                        elif orientacion  == "S":
+                            fila += 1
+                        elif orientacion == "E":
+                            columna += 1
+                        else:
+                            columna -= 1
+                        pieza = (fila,columna)
+                        barco.append(pieza)
+                else:
+                    barco.append(pieza_original)
+                tablero_temp = coloca_barco_plus(tablero, barco)
+                if type(tablero_temp) == np.ndarray:
+                    return tablero_temp
+            except:
+                print('Has introducido un dato erroneo, vuelve a intentarlo')
+
+
+def recibir_disparo_maquina(tablero1, tablero2):
     while True:
-        posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
-        barco = []
-        # Construimos el hipotetico barco
-        pieza_original = (fila - 1, posicion[columna])
-        barco.append(pieza_original)
-        orientacion = punto_cardinal
-        fila = pieza_original[0]
-        columna = pieza_original[1]
-        for i in range(eslora -1):
-            if orientacion == "N":
-                fila -= 1
-            elif orientacion  == "S":
-                fila += 1
-            elif orientacion == "E":
-                columna += 1
+        try:
+            fila = int(input("Introduce el número de fila: "))
+            columna = input("Introduce la letra de la columna: ").upper()
+            posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
+            coordenada = (fila - 1, posicion[columna])
+            print(f'Tu elección ha sido la fila {fila} y la columna {columna}')
+            time.sleep(2)
+            if tablero1[coordenada] == "O":
+                tablero1[coordenada] = "X"
+                tablero2[coordenada] = "X"
+                print("Tocado")
+                return False
+            elif tablero2[coordenada] == "X" or tablero2[coordenada] == "~":
+                print("Ahí ya has disparado, dispara a otro sitio!!")
             else:
-                columna -= 1
-            pieza = (fila,columna)
-            barco.append(pieza)
-        tablero_temp = coloca_barco_plus(tablero, barco)
-        if type(tablero_temp) == np.ndarray:
-            return tablero_temp
-
-
-banner = r'''
-  |   |  |   |   \  |  __ \ _ _|   _ \       |         \         ____|  |       _ \ __ __|   \    
-  |   |  |   |    \ |  |   |  |   |   |      |        _ \        |      |      |   |   |    _ \   
-  ___ |  |   |  |\  |  |   |  |   __ <       |       ___ \       __|    |      |   |   |   ___ \  
- _|  _| \___/  _| \_| ____/ ___| _| \_\     _____| _/    _\     _|     _____| \___/   _| _/    _\ 
-                                                                                                  
-'''
-
-print(banner)
+                tablero2[coordenada] = "~"
+                print("Agua")
+                return False
+        except:
+            print('Has introducido un dato erroneo, vuelve a intentarlo')
