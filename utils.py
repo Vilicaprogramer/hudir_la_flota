@@ -3,8 +3,12 @@ Habrá un apartado de funciones que interactuarán con el usuario y otro apartad
 que trabajarán con la máquina'''
 import random
 import numpy as np
-import time
+import time 
 
+
+# Funcionalidades del programa
+
+# Variable con el titulo del juego descargado de https://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
 banner = r'''
   |   |  |   |   \  |  __ \ _ _|   _ \       |         \         ____|  |       _ \ __ __|   \    
   |   |  |   |    \ |  |   |  |   |   |      |        _ \        |      |      |   |   |    _ \   
@@ -13,10 +17,12 @@ banner = r'''
                                                                                                   
 '''
 
+# Lista de números que representan el número de barcos y su eslora
 #barcos = [5,4,4,3,3,3,2,2,1,1,1,1]
 barcos = [10,1]
 
 def lanza_moneda():
+    '''Función que simula un lanzamiento de moneda para elegir quien comienza'''
     while True:
         moneda = input('Elige cara o cruz para ver quien empieza: ').lower()
         if moneda not in ['cara', 'cruz']:
@@ -34,6 +40,8 @@ def lanza_moneda():
 
 
 def verificar_tablero(tablero):
+    '''Función que al ser llamada verifica el tablero dado iterando por cada fila verifiacndo si queda 
+    algun barco sin disparar en el tablero'''
     if any("O" in fila for fila in tablero):
         return True
     else:
@@ -41,11 +49,14 @@ def verificar_tablero(tablero):
 
 # Funciones de la máquina
 def crea_tablero(lado = 10, simbolo = "~"):
+    '''Función que por defecto crea un tablero de 10x10 relleno con el simbolo "~"'''
     tablero = np.full((lado,lado),simbolo)
     return tablero
 
 
 def mostrar_tablero(tablero):
+    '''Función que muestra por pantalla el tablero pasado como argumento, y lo muestra con el formato,
+    filas numeradas del 1 al 10 y columnas con el encabezado marcado con letras de la A a la J'''
     print( '     A ',' B ',' C ',' D ',' E ',' F ',' G ',' H ',' I ',' J ')
     for i in range(len(tablero)):
         if i < 9:
@@ -54,7 +65,8 @@ def mostrar_tablero(tablero):
             print(f'{i+1}-{tablero[i]}')
 
 def coloca_barco_plus(tablero, barco):
-    # Nos devuelve el tablero si puede colocar el barco, si no devuelve False, y avise por pantalla
+    '''Función que nos devuelve el tablero si puede colocar el barco, si no devuelve False, 
+    y avisa por pantalla'''
     tablero_temp = tablero.copy()
     num_max_filas = tablero.shape[0]
     num_max_columnas = tablero.shape[1]
@@ -74,6 +86,7 @@ def coloca_barco_plus(tablero, barco):
 
 
 def crea_barco_aleatorio(tablero, eslora):
+    '''Función que genera barcos y los coloca en el tablero de forma aleatoria'''
     num_max_filas = tablero.shape[0]
     num_max_columnas = tablero.shape[1]
     while True:
@@ -100,6 +113,7 @@ def crea_barco_aleatorio(tablero, eslora):
             return tablero_temp
 
 def recibir_disparo_humano(tablero1, tablero2):
+    '''Función que simula el turno de disparar del usuario'''
     while True:
         posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
         num_max_filas = tablero1.shape[0]
@@ -124,40 +138,42 @@ def recibir_disparo_humano(tablero1, tablero2):
 # Funciones de usuario
 
 def crea_barco_usuario(tablero, eslora):
-        while True:
-            posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
-            barco = []
-            try:
-                fila = int(input("Introduce el número de fila: "))
-                columna = input("Introduce la letra de la columna: ").upper()
-                pieza_original = (fila - 1, posicion[columna])
+    '''Función que para colocar los diferentes barcos en el tablero del usuario humano'''    
+    while True:
+        posicion = {'A': 0,'B': 1,'C': 2,'D': 3,'E': 4,'F': 5,'G': 6,'H': 7,'I': 8,'J': 9}
+        barco = []
+        try:
+            fila = int(input("Introduce el número de fila: "))
+            columna = input("Introduce la letra de la columna: ").upper()
+            pieza_original = (fila - 1, posicion[columna])
+            barco.append(pieza_original)
+            fila = pieza_original[0]
+            columna = pieza_original[1]
+            if eslora != 1:
+                orientacion = input("Introduce N,S,O,E para ver la dirección del barco: ").upper()
+            # Construimos el hipotetico barco
+                for i in range(eslora -1):
+                    if orientacion == "N":
+                        fila -= 1
+                    elif orientacion  == "S":
+                        fila += 1
+                    elif orientacion == "E":
+                        columna += 1
+                    else:
+                        columna -= 1
+                    pieza = (fila,columna)
+                    barco.append(pieza)
+            else:
                 barco.append(pieza_original)
-                fila = pieza_original[0]
-                columna = pieza_original[1]
-                if eslora != 1:
-                    orientacion = input("Introduce N,S,O,E para ver la dirección del barco: ").upper()
-                # Construimos el hipotetico barco
-                    for i in range(eslora -1):
-                        if orientacion == "N":
-                            fila -= 1
-                        elif orientacion  == "S":
-                            fila += 1
-                        elif orientacion == "E":
-                            columna += 1
-                        else:
-                            columna -= 1
-                        pieza = (fila,columna)
-                        barco.append(pieza)
-                else:
-                    barco.append(pieza_original)
-                tablero_temp = coloca_barco_plus(tablero, barco)
-                if type(tablero_temp) == np.ndarray:
-                    return tablero_temp
-            except:
-                print('Has introducido un dato erroneo, vuelve a intentarlo')
+            tablero_temp = coloca_barco_plus(tablero, barco)
+            if type(tablero_temp) == np.ndarray:
+                return tablero_temp
+        except:
+            print('Has introducido un dato erroneo, vuelve a intentarlo')
 
 
 def recibir_disparo_maquina(tablero1, tablero2):
+    '''Función que simula el turno de disparar de la máquina'''
     while True:
         try:
             fila = int(input("Introduce el número de fila: "))
