@@ -19,7 +19,7 @@ banner = r'''
 
 # Lista de números que representan el número de barcos y su eslora
 #barcos = [5,4,4,3,3,3,2,2,1,1,1,1]
-barcos = [10,1]
+barcos = [5,4,3,2,1]
 
 def lanza_moneda():
     '''Función que simula un lanzamiento de moneda para elegir quien comienza'''

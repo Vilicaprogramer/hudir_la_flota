@@ -5,6 +5,8 @@ import time
 '''main.py es el archivo principal, donde se llama a las funciones del juego y se aplica la lógica del juego,
 Tras mostrar el título y cargar el tablero de la máquina de forma aleatoria, solicitará la colocación de los 
 diferentes barcos del tablero al usuario.'''
+os.system('cls' if os.name == 'nt' else 'clear')
+
 
 print(utils.banner)
 print("Cargando....")
